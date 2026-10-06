@@ -22,7 +22,7 @@ The **Phoenix Oasis Modeler** models real-world trade-offs across Phoenix, Arizo
 
 * **Real-Time Client-Side Reactivity:** Instant recalculation across all key metrics and Chart.js visualizations upon slider movement with zero network latency.
 
-* **Dynamic Pre-Tax & Tax Waterfall:** Simulates Section 125 pre-tax healthcare deductions, Traditional 401(k) contributions, single standard deductions ($\$14,600$), marginal federal income tax brackets, FICA ($7.65\%$), and Arizona's statutory flat tax ($2.5\%$).
+* **Dynamic Pre-Tax and Tax Waterfall:** Simulates Section 125 pre-tax healthcare deductions, Traditional 401(k) contributions, single standard deductions ($\$14,600$), marginal federal income tax brackets, FICA ($7.65\%$), and Arizona's statutory flat tax ($2.5\%$).
 
 * **Non-Negotiable Reserve Floor (**$\$200/\text{mo}$**):** Automatically audits cash flow against a minimum liquidity cushion before certifying any lifestyle plan as financially sound.
 
