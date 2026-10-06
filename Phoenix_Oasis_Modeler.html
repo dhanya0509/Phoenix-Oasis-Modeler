@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phoenix Oasis Modeler & Scenario Comparator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js for interactive analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            desert: {
+              sand: '#FAF6F0',
+              linen: '#F4ECE1',
+              terracotta: '#D96B43',
+              sedona: '#E76F51',
+              gold: '#E9C46A',
+              sage: '#588157',
+              cactus: '#3A5A40',
+              pacific: '#2A9D8F',
+              canyon: '#264653',
+              dusk: '#1C1618',
+              night: '#120F11',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .font-mono, .font-heading {
+      font-family: 'Space Grotesk', monospace;
+    }
+
+    /* West Coast Sunlit Backdrop Aura */
+    .westcoast-bg-light {
+      background: 
+        radial-gradient(ellipse 90% 45% at 50% -10%, rgba(244, 162, 97, 0.22), transparent 75%),
+        radial-gradient(ellipse 60% 40% at 90% 15%, rgba(231, 111, 81, 0.12), transparent 60%),
+        radial-gradient(ellipse 50% 30% at 10% 25%, rgba(42, 157, 143, 0.10), transparent 50%),
+        #FAF6F0;
+    }
+    .dark .westcoast-bg-dark {
+      background: 
+        radial-gradient(ellipse 90% 45% at 50% -10%, rgba(217, 107, 67, 0.18), transparent 75%),
+        radial-gradient(ellipse 60% 40% at 85% 20%, rgba(157, 78, 221, 0.12), transparent 60%),
+        radial-gradient(ellipse 50% 30% at 15% 30%, rgba(42, 157, 143, 0.09), transparent 55%),
+        #120F11;
+    }
+
+    /* Custom West Coast Sunset Range Sliders */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]:focus {
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 7px;
+      cursor: pointer;
+      background: #E8DFD3;
+      border-radius: 9999px;
+    }
+    .dark input[type=range]::-webkit-slider-runnable-track {
+      background: #2C2328;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #F4A261, #E76F51);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -6.5px;
+      box-shadow: 0 2px 6px rgba(217, 107, 67, 0.35);
+      border: 2px solid #FFFFFF;
+      transition: transform 0.15s ease, box-shadow 0.15s;
+    }
+    .dark input[type=range]::-webkit-slider-thumb {
+      border: 2px solid #2C2328;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+      box-shadow: 0 4px 10px rgba(217, 107, 67, 0.55);
+    }
+    input[type=range]::-moz-range-track {
+      width: 100%;
+      height: 7px;
+      cursor: pointer;
+      background: #E8DFD3;
+      border-radius: 9999px;
+    }
+    input[type=range]::-moz-range-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #F4A261, #E76F51);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(217, 107, 67, 0.35);
+      border: 2px solid #FFFFFF;
+    }
+    .desert-card {
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(228, 218, 206, 0.85);
+      box-shadow: 0 4px 20px -2px rgba(90, 60, 40, 0.04);
+    }
+    .dark .desert-card {
+      background: rgba(28, 22, 26, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(66, 50, 58, 0.65);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body class="westcoast-bg-light dark:westcoast-bg-dark text-stone-800 dark:text-stone-100 min-h-screen antialiased p-3 sm:p-6 lg:p-8 transition-colors duration-300">
+  <div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- Top App Header -->
+    <header class="desert-card rounded-3xl p-5 sm:p-7 flex flex-col md:flex-row md:items-center md:justify-between gap-5 relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-52 h-52 rounded-full bg-gradient-to-br from-amber-300/30 to-rose-400/20 blur-2xl pointer-events-none"></div>
+
+      <div class="relative z-10">
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center justify-center p-3 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-950/70 dark:to-orange-950/70 text-orange-600 dark:text-orange-400 rounded-2xl shadow-xs border border-orange-200/50 dark:border-orange-800/40">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </span>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight font-heading text-stone-900 dark:text-stone-50">
+                Phoenix Oasis Modeler
+              </h1>
+              <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-950/70 dark:text-orange-300 border border-orange-200 dark:border-orange-800/60">
+                Valley of the Sun
+              </span>
+            </div>
+            <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+              Gross: <strong class="text-stone-800 dark:text-stone-200">$60k/yr ($5,000/mo)</strong> • Take-Home Paycheck: <strong class="text-orange-600 dark:text-orange-400 font-mono font-bold" id="headerNetPay">$3,770/mo</strong> • Minimum Reserve Floor: <strong class="text-emerald-700 dark:text-emerald-400 font-bold">$200/mo</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="flex flex-wrap items-center gap-2.5 relative z-10">
+        <button id="themeToggleBtn" type="button" class="p-2.5 text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white bg-stone-100/90 hover:bg-stone-200/90 dark:bg-stone-800/80 dark:hover:bg-stone-700/80 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 transition-all duration-200 shadow-2xs" title="Toggle dark mode">
+          <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+        <button id="resetDefaultsBtn" type="button" class="text-xs font-semibold px-3.5 py-2.5 bg-stone-100/90 hover:bg-stone-200/90 dark:bg-stone-800/80 dark:hover:bg-stone-700/80 text-stone-700 dark:text-stone-200 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 transition-all duration-200 shadow-2xs">
+          Reset Levers
+        </button>
+        <button id="copyPlanBtn" type="button" class="text-xs font-semibold px-4 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+          <span>Share Plan</span>
+        </button>
+      </div>
+    </header>
+
+    <div id="savingsStatusAlert" class="rounded-2xl p-4 transition-all duration-300 flex items-start gap-3 border shadow-2xs">
+      <!-- Dynamic live status injected via JS -->
+    </div>
+
+    <!-- Phoenix Tax Breakdown Banner -->
+    <div class="desert-card rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs border border-orange-200/60 dark:border-orange-950/60">
+      <div class="flex items-center gap-2.5">
+        <span class="text-lg">☀️</span>
+        <div>
+          <span class="font-bold text-stone-900 dark:text-stone-100">Sonoran Paycheck Flow ($5,000 Gross):</span>
+          <span class="text-stone-600 dark:text-stone-400 ml-1" id="taxBannerSubtitle">Pre-tax benefits & tax withholdings update live as you move sliders.</span>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]">
+        <span class="px-2.5 py-1 rounded-xl bg-amber-50/80 dark:bg-stone-800 border border-amber-200/80 dark:border-stone-700 text-stone-700 dark:text-stone-300" id="pillPreTaxTotal">Pre-Tax: -$400</span>
+        <span class="px-2.5 py-1 rounded-xl bg-amber-50/80 dark:bg-stone-800 border border-amber-200/80 dark:border-stone-700 text-stone-700 dark:text-stone-300" id="pillFedTax">Fed: -$354</span>
+        <span class="px-2.5 py-1 rounded-xl bg-amber-50/80 dark:bg-stone-800 border border-amber-200/80 dark:border-stone-700 text-stone-700 dark:text-stone-300" id="pillFicaTax">FICA: -$371</span>
+        <span class="px-2.5 py-1 rounded-xl bg-amber-50/80 dark:bg-stone-800 border border-amber-200/80 dark:border-stone-700 text-stone-700 dark:text-stone-300" id="pillStateTax">AZ Flat (2.5%): -$79</span>
+        <span class="px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold shadow-2xs" id="pillNetPay">Net: $3,796/mo</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+      <div class="desert-card rounded-2xl p-4 sm:p-5">
+        <p class="text-xs font-medium text-stone-500 dark:text-stone-400">Total Outflows</p>
+        <div class="flex items-baseline gap-1 mt-1">
+          <span class="text-2xl sm:text-3xl font-extrabold font-mono text-stone-900 dark:text-stone-100" id="kpiTotalOutflows">$2,800</span>
+          <span class="text-xs text-stone-400">/mo</span>
+        </div>
+        <p class="text-[11px] text-stone-400 mt-1" id="kpiIncomeShare">68% of income</p>
+      </div>
+
+      <div class="desert-card rounded-2xl p-4 sm:p-5">
+        <p class="text-xs font-medium text-stone-500 dark:text-stone-400">Monthly Net Surplus</p>
+        <div class="flex items-baseline gap-1 mt-1">
+          <span class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400" id="kpiNetSurplus">$1,308</span>
+          <span class="text-xs text-stone-400">/mo</span>
+        </div>
+        <p class="text-[11px] text-stone-400 mt-1" id="kpiSurplusFloor">Target floor: $200</p>
+      </div>
+
+      <div class="desert-card rounded-2xl p-4 sm:p-5">
+        <p class="text-xs font-medium text-stone-500 dark:text-stone-400">Daily Flexibility</p>
+        <div class="flex items-baseline gap-1 mt-1">
+          <span class="text-2xl sm:text-3xl font-extrabold font-mono text-amber-600 dark:text-amber-400" id="kpiDailyDiscretionary">$18.33</span>
+          <span class="text-xs text-stone-400">/day</span>
+        </div>
+        <p class="text-[11px] text-stone-400 mt-1">Living & dining buffer</p>
+      </div>
+
+      <div class="desert-card rounded-2xl p-4 sm:p-5">
+        <p class="text-xs font-medium text-stone-500 dark:text-stone-400">Loan Paydown Rate</p>
+        <div class="flex items-baseline gap-1 mt-1">
+          <span class="text-2xl sm:text-3xl font-extrabold font-mono text-orange-600 dark:text-orange-400" id="kpiLoanSpeed">$1,200</span>
+          <span class="text-xs text-stone-400">/mo</span>
+        </div>
+        <p class="text-[11px] text-stone-400 mt-1" id="kpiDebtPace">Accelerated payoff rate</p>
+      </div>
+
+      <div class="desert-card rounded-2xl p-4 sm:p-5 col-span-2 md:col-span-1">
+        <p class="text-xs font-medium text-teal-700 dark:text-teal-400 flex items-center gap-1">
+          <span>🌴</span> Year-End Bank
+        </p>
+        <div class="flex items-baseline gap-1 mt-1">
+          <span class="text-2xl sm:text-3xl font-extrabold font-mono text-teal-700 dark:text-teal-400" id="kpiYearEndSavings">$15,196</span>
+          <span class="text-xs text-stone-400">/yr</span>
+        </div>
+        <p class="text-[11px] text-stone-400 mt-1" id="kpiYearEndSub">After $500 trip in Month 6</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: The 3 Primary Levers (Sliders) -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="desert-card rounded-3xl p-5 sm:p-7 space-y-6">
+          <!-- Step 1: Pre-Tax Benefits & Retirement Deductions (Decide at the Start) -->
+          <div class="space-y-4 p-4 bg-gradient-to-br from-indigo-50/60 to-purple-50/40 dark:from-indigo-950/30 dark:to-purple-950/20 rounded-2xl border border-indigo-200/70 dark:border-indigo-800/40">
+            <div class="flex items-center justify-between border-b border-indigo-100 dark:border-indigo-900/40 pb-2">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-800 dark:text-indigo-300 flex items-center gap-1.5">
+                  <span>💼</span> Step 1: Pre-Tax Cuts (401k & Insurance)
+                </span>
+                <p class="text-xs text-stone-500 dark:text-stone-400">Decide your deductions first to determine monthly net take-home.</p>
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-medium text-stone-500 dark:text-stone-400">Total Deductions:</span>
+                <span class="text-lg font-extrabold font-mono text-indigo-700 dark:text-indigo-300 ml-1" id="valTotalPreTax">$400</span>
+                <span class="text-xs text-stone-400">/mo</span>
+              </div>
+            </div>
+
+            <!-- 401(k) Contribution Slider -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-stone-700 dark:text-stone-300 font-medium">401(k) Retirement Savings</span>
+                <span class="font-mono font-bold text-indigo-700 dark:text-indigo-300" id="val401k">$250/mo (5%)</span>
+              </div>
+              <input type="range" id="slider401k" min="0" max="1000" step="25" value="250">
+              <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                <span>$0 (0% Match)</span>
+                <span>$250 (5% Typical Match)</span>
+                <span>$1,000 (20% Max Out)</span>
+              </div>
+            </div>
+
+            <!-- Medical Insurance Slider -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-stone-700 dark:text-stone-300 font-medium">Medical / Health Plan Premium</span>
+                <span class="font-mono font-bold text-stone-800 dark:text-stone-200" id="valMedical">$120/mo</span>
+              </div>
+              <input type="range" id="sliderMedical" min="0" max="400" step="10" value="120">
+              <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                <span>$0 (Company Paid)</span>
+                <span>$120 (Standard HDHP/PPO)</span>
+                <span>$400 (Low Deductible Gold)</span>
+              </div>
+            </div>
+
+            <!-- Dental & Vision Slider -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-stone-700 dark:text-stone-300 font-medium">Dental & Vision Supplemental</span>
+                <span class="font-mono font-bold text-stone-800 dark:text-stone-200" id="valDentalVision">$30/mo</span>
+              </div>
+              <input type="range" id="sliderDentalVision" min="0" max="100" step="5" value="30">
+              <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                <span>$0 (Declined)</span>
+                <span>$30 (Standard Combined)</span>
+                <span>$100 (Comprehensive High)</span>
+              </div>
+            </div>
+
+            <!-- Live Net Pay Impact Pill -->
+            <div class="pt-2 border-t border-indigo-100 dark:border-indigo-900/30 flex items-center justify-between text-xs">
+              <span class="text-stone-600 dark:text-stone-400 text-[11px]">Tax Shelter Benefit:</span>
+              <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-[11px]" id="valTaxShelterSave">Saves $88/mo in taxes</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between border-b border-stone-200/60 dark:border-stone-800 pb-3 pt-2">
+            <div>
+              <h2 class="text-lg font-bold font-heading">Step 2: Living & Debt Levers</h2>
+              <p class="text-xs text-stone-500 dark:text-stone-400">Fine-tune your debt speed, Valley room lease, and living buffer.</p>
+            </div>
+            <span class="text-xs font-semibold px-2.5 py-1 bg-amber-100/80 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-xl border border-amber-200/60 dark:border-amber-900/40">
+              Live Modeler
+            </span>
+          </div>
+
+          <!-- Lever 1: Loan Allocation -->
+          <div class="space-y-2 p-4 bg-orange-50/40 dark:bg-orange-950/20 rounded-2xl border border-orange-100 dark:border-orange-900/30">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-orange-700 dark:text-orange-400">Lever 1: Accelerated Loan Payment</span>
+                <p class="text-xs text-stone-500 dark:text-stone-400">Baseline commitment is $1,000+ to accelerate payoff</p>
+              </div>
+              <div class="text-right">
+                <span class="text-xl font-extrabold font-mono text-orange-600 dark:text-orange-400" id="valLoan">$1,200</span>
+                <span class="text-xs text-stone-400">/mo</span>
+              </div>
+            </div>
+            <input type="range" id="sliderLoan" min="1000" max="2200" step="50" value="1200" class="mt-2">
+            <div class="flex justify-between text-[11px] font-mono text-stone-400">
+              <span>$1,000 (Min Baseline)</span>
+              <span>$1,600 (Aggressive)</span>
+              <span>$2,200 (Extreme Push)</span>
+            </div>
+          </div>
+
+          <!-- Lever 2: Housing & Utilities -->
+          <div class="space-y-4 p-4 bg-amber-50/40 dark:bg-amber-950/20 rounded-2xl border border-amber-100 dark:border-amber-900/30">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">Lever 2: Housing & Utilities Commitment</span>
+                <p class="text-xs text-stone-500 dark:text-stone-400">Room lease and Phoenix electric/air-conditioning</p>
+              </div>
+              <div class="text-right">
+                <span class="text-xl font-extrabold font-mono text-amber-700 dark:text-amber-300" id="valTotalHousing">$1,100</span>
+                <span class="text-xs text-stone-400">/mo</span>
+              </div>
+            </div>
+
+            <!-- Rent Sub-slider -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-stone-700 dark:text-stone-300 font-medium">Room Rent</span>
+                <span class="font-mono font-bold text-stone-800 dark:text-stone-200" id="valRent">$950/mo</span>
+              </div>
+              <input type="range" id="sliderRent" min="600" max="1600" step="25" value="950">
+              <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                <span>$600 (Shared/Glendale)</span>
+                <span>$1,100 (Tempe/Scottsdale)</span>
+                <span>$1,600 (Private Studio)</span>
+              </div>
+            </div>
+
+            <!-- Utilities Sub-slider -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-stone-700 dark:text-stone-300 font-medium">Utilities + WiFi (Phoenix Summer A/C)</span>
+                <span class="font-mono font-bold text-stone-800 dark:text-stone-200" id="valUtilities">$150/mo</span>
+              </div>
+              <input type="range" id="sliderUtilities" min="50" max="350" step="10" value="150">
+              <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                <span>$50 (Split 4-ways)</span>
+                <span>$150 (Typical 2-bed split)</span>
+                <span>$350 (Summer Peak Solo)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lever 3: Living & Lifestyle Maintenance -->
+          <div class="space-y-4 p-4 bg-emerald-50/40 dark:bg-emerald-950/20 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">Lever 3: Living & Lifestyle Maintenance</span>
+                <p class="text-xs text-stone-500 dark:text-stone-400">Food, commute, and personal allowance</p>
+              </div>
+              <div class="text-right">
+                <span class="text-xl font-extrabold font-mono text-emerald-700 dark:text-emerald-400" id="valTotalLiving">$500</span>
+                <span class="text-xs text-stone-400">/mo</span>
+              </div>
+            </div>
+
+            <!-- Groceries Slider: Starts at $100 -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-stone-700 dark:text-stone-300 font-medium">Groceries & Dining Essentials</span>
+                <span class="font-mono font-bold text-stone-800 dark:text-stone-200" id="valGroceries">$350/mo</span>
+              </div>
+              <input type="range" id="sliderGroceries" min="100" max="800" step="10" value="350">
+              <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                <span>$100 (Minimum Starter)</span>
+                <span>$400 (Cook at home)</span>
+                <span>$800 (Dining out)</span>
+              </div>
+            </div>
+
+            <!-- Commute Slider: Starts at $10 -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-stone-700 dark:text-stone-300 font-medium">Commute & Transit (Light Rail / Gas)</span>
+                <span class="font-mono font-bold text-stone-800 dark:text-stone-200" id="valCommute">$100/mo</span>
+              </div>
+              <input type="range" id="sliderCommute" min="10" max="400" step="5" value="100">
+              <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                <span>$10 (Remote / Walk)</span>
+                <span>$64 (Valley Metro Pass)</span>
+                <span>$400 (Long I-10 Commute)</span>
+              </div>
+            </div>
+
+            <!-- Personal Subscriptions Slider: Starts at $20 -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-stone-700 dark:text-stone-300 font-medium">Personal, Subscriptions & Discretionary</span>
+                <span class="font-mono font-bold text-stone-800 dark:text-stone-200" id="valPersonal">$50/mo</span>
+              </div>
+              <input type="range" id="sliderPersonal" min="20" max="500" step="5" value="50">
+              <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                <span>$20 (Bare Minimal)</span>
+                <span>$100 (Modest phone + gym)</span>
+                <span>$500 (Active weekend life)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Periodic Travel Planner Lever -->
+          <div class="space-y-4 p-4 bg-teal-50/40 dark:bg-teal-950/20 rounded-2xl border border-teal-100 dark:border-teal-900/30">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-teal-800 dark:text-teal-400 flex items-center gap-1.5">
+                  <span>✈️</span> Travel Sinking Fund Planner
+                </span>
+                <p class="text-xs text-stone-500 dark:text-stone-400">Plan a getaway and see how it impacts your year-end reserves</p>
+              </div>
+              <div class="text-right">
+                <span class="text-xl font-extrabold font-mono text-teal-700 dark:text-teal-400" id="valTripCost">$500</span>
+                <span class="text-xs text-stone-400" id="valTripTimingLabel">in Month 6</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs">
+                  <span class="text-stone-700 dark:text-stone-300 font-medium">Planned Trip Budget</span>
+                  <span class="font-mono font-bold text-stone-800 dark:text-stone-200" id="valTripCostSub">$500</span>
+                </div>
+                <input type="range" id="sliderTripCost" min="0" max="2000" step="50" value="500">
+                <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                  <span>$0 (Staycation)</span>
+                  <span>$500 (Weekend Roadtrip)</span>
+                  <span>$2,000 (Flight & Resort)</span>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs">
+                  <span class="text-stone-700 dark:text-stone-300 font-medium">When Will You Travel?</span>
+                  <span class="font-mono font-bold text-stone-800 dark:text-stone-200" id="valTripMonth">Month 6</span>
+                </div>
+                <input type="range" id="sliderTripMonth" min="1" max="12" step="1" value="6">
+                <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                  <span>Mo 1 (Immediate)</span>
+                  <span>Mo 6 (Mid-Year)</span>
+                  <span>Mo 12 (Year-End)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Visual Breakdown & Resiliency Check -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="desert-card rounded-3xl p-5 sm:p-7 space-y-6">
+          <div class="flex items-center justify-between border-b border-stone-200/60 dark:border-stone-800 pb-3">
+            <div>
+              <h2 class="text-lg font-bold font-heading">Monthly Cash Flow Breakdown</h2>
+              <p class="text-xs text-stone-500 dark:text-stone-400" id="cardCashflowSub">Distribution of your net income</p>
+            </div>
+            <span class="text-xs font-mono font-semibold px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
+              100% Net
+            </span>
+          </div>
+
+          <!-- Segmented Progress Bar -->
+          <div class="space-y-2">
+            <div class="h-4 w-full bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden flex shadow-inner">
+              <div id="barLoan" class="bg-gradient-to-r from-orange-500 to-rose-500 transition-all duration-300" style="width: 29.2%"></div>
+              <div id="barHousing" class="bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-300" style="width: 26.8%"></div>
+              <div id="barLiving" class="bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300" style="width: 12.2%"></div>
+              <div id="barSurplus" class="bg-gradient-to-r from-teal-400 to-cyan-500 transition-all duration-300" style="width: 31.8%"></div>
+            </div>
+            <div class="grid grid-cols-4 text-center text-[10px] font-mono text-stone-500 dark:text-stone-400">
+              <div>Loan (<span id="pctLoan">29%</span>)</div>
+              <div>Housing (<span id="pctHousing">27%</span>)</div>
+              <div>Living (<span id="pctLiving">12%</span>)</div>
+              <div class="text-emerald-600 dark:text-emerald-400 font-bold">Surplus (<span id="pctSurplus">32%</span>)</div>
+            </div>
+          </div>
+
+          <!-- Chart.js Doughnut Container -->
+          <div class="relative h-56 flex items-center justify-center">
+            <canvas id="cashflowChart"></canvas>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span class="text-xs uppercase tracking-wider text-stone-400 font-medium">Free Surplus</span>
+              <span class="text-2xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400" id="chartCenterSurplus">$1,308</span>
+              <span class="text-[10px] text-stone-400" id="chartCenterRatio">31.8% rate</span>
+            </div>
+          </div>
+
+          <!-- Interactive Legend Tags -->
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-orange-50/70 dark:bg-orange-950/20 border border-orange-200/50 dark:border-orange-900/30 flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-medium">
+                <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span> Loan Accelerate
+              </span>
+              <span class="font-mono font-bold text-orange-700 dark:text-orange-400" id="legLoan">$1,200</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-medium">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Housing & Utilities
+              </span>
+              <span class="font-mono font-bold text-amber-700 dark:text-amber-300" id="legHousing">$1,100</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-900/30 flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-medium">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Lifestyle Baseline
+              </span>
+              <span class="font-mono font-bold text-emerald-700 dark:text-emerald-400" id="legLiving">$500</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-teal-50/70 dark:bg-teal-950/20 border border-teal-200/50 dark:border-teal-900/30 flex items-center justify-between">
+              <span class="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-medium">
+                <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span> Monthly Savings
+              </span>
+              <span class="font-mono font-bold text-teal-700 dark:text-teal-400" id="legSurplus">$1,308</span>
+            </div>
+          </div>
+
+          <!-- Stress Test Resiliency Card -->
+          <div class="p-4 rounded-2xl bg-stone-50 dark:bg-stone-800/60 border border-stone-200/70 dark:border-stone-700/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 flex items-center gap-1.5">
+                <span>🛡️</span> Financial Resiliency Check
+              </span>
+              <span id="feasibilityPill" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                Healthy Surplus
+              </span>
+            </div>
+            <p class="text-xs text-stone-500 dark:text-stone-400" id="feasibilityNote">
+              Your surplus exceeds the $200 minimum reserve floor by <strong class="text-emerald-600 dark:text-emerald-400 font-mono" id="surplusCushion">+$1,108</strong>.
+            </p>
+            <div class="pt-1 flex items-center justify-between text-[11px] text-stone-400 border-t border-stone-200 dark:border-stone-700/50">
+              <span>Car repair / medical shock buffer:</span>
+              <span class="font-mono font-bold text-stone-700 dark:text-stone-300" id="unexpectedBuffer">Safe up to $1,308</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle Visualization Row: Full-Width 12-Month Sinking Fund Trajectory (Radar Removed) -->
+    <div class="desert-card rounded-3xl p-5 sm:p-7 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-stone-200/60 dark:border-stone-800 pb-3">
+        <div>
+          <h2 class="text-lg font-bold font-heading flex items-center gap-2">
+            <span>📈</span> 12-Month Bank Accumulation Trajectory
+          </h2>
+          <p class="text-xs text-stone-500 dark:text-stone-400">
+            Simulates dynamic cash reserves after pre-tax cuts, loan acceleration, and the planned travel withdrawal.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 text-xs font-mono">
+          <span class="flex items-center gap-1 text-teal-700 dark:text-teal-400 font-semibold">
+            <span class="w-3 h-1 bg-teal-500 rounded-full inline-block"></span> Your Forecast
+          </span>
+          <span class="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold">
+            <span class="w-3 h-1 bg-amber-500 rounded-full inline-block border-dashed"></span> $200/mo Floor
+          </span>
+        </div>
+      </div>
+
+      <div class="h-64 sm:h-80 w-full">
+        <canvas id="savingsTrajectoryChart"></canvas>
+      </div>
+
+      <div id="trajectoryInsight" class="text-xs p-3.5 rounded-2xl bg-teal-50/60 dark:bg-teal-950/20 border border-teal-200/50 dark:border-teal-900/30 text-teal-900 dark:text-teal-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <span>By Month 12, your emergency bank reserve reaches <strong>$11,380</strong> after absorbing your travel plan.</span>
+        <span class="font-mono font-bold text-teal-700 dark:text-teal-300">+$8,980 vs floor</span>
+      </div>
+    </div>
+
+    <!-- Side-by-Side Apartment & Lifestyle Comparator -->
+    <div class="desert-card rounded-3xl p-5 sm:p-7 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-stone-200/60 dark:border-stone-800 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-xl font-bold font-heading">Side-by-Side Scenario Battleboard</h2>
+            <span class="text-xs font-semibold px-2.5 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 rounded-full">
+              Automated Scoring
+            </span>
+          </div>
+          <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+            Benchmarks your custom live sliders against 4 real-world Phoenix living scenarios to see which one wins.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 text-xs">
+          <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Meets $200 Floor
+          </span>
+          <span class="flex items-center gap-1 text-rose-500 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span> Violates Floor
+          </span>
+        </div>
+      </div>
+
+      <!-- Comparison Chart: 1-Year Debt Cleared vs. Bank Reserve -->
+      <div class="space-y-2">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">1-Year Financial Impact Storyboard</h3>
+        <div class="h-56 w-full">
+          <canvas id="scenarioComparisonChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Scenarios Grid -->
+      <div id="scenariosGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // State management
+    const state = {
+      grossMonthly: 5000, // $60,000 / yr
+      contrib401k: 250,   // Monthly 401(k) slider
+      medical: 120,       // Monthly health insurance slider
+      dentalVision: 30,   // Monthly dental & vision slider
+      income: 3796,       // Dynamically calculated post-tax net take-home
+      reserveFloor: 200,  // Non-negotiable monthly savings target
+      loan: 1200,
+      rent: 950,
+      utilities: 150,
+      groceries: 350,
+      commute: 100,
+      personal: 50,
+      tripCost: 500,
+      tripMonth: 6,
+      darkMode: false
+    };
+
+    // Predefined Phoenix apartment and lifestyle profiles
+    const presetScenarios = [
+      {
+        id: 'optA',
+        title: 'West Valley Commuter',
+        location: 'Glendale / Peoria',
+        emoji: '🌵',
+        badge: 'Maximum Cash Reserve',
+        rent: 750,
+        utilities: 110,
+        loan: 1200,
+        groceries: 320,
+        commute: 220, // Higher I-10 gas & toll budget
+        personal: 70,
+        tripCost: 500,
+        tripMonth: 6,
+        color: 'border-amber-300 dark:border-amber-700/60',
+        summary: 'Cheaper rent offsets high gas; stockpiles the largest bank reserve.'
+      },
+      {
+        id: 'optB',
+        title: 'Tempe Transit Hub',
+        location: 'Near Valley Metro Rail',
+        emoji: '🚆',
+        badge: 'Top Balanced Pick',
+        rent: 1050,
+        utilities: 140,
+        loan: 1350,
+        groceries: 340,
+        commute: 64, // Metro transit pass
+        personal: 120,
+        tripCost: 500,
+        tripMonth: 6,
+        color: 'border-teal-400 dark:border-teal-700/80',
+        summary: 'Walkable, eliminates car strain, accelerates loans while saving reliably.'
+      },
+      {
+        id: 'optC',
+        title: 'Aggressive Debt Squeeze',
+        location: 'Shared Central Room',
+        emoji: '⚡',
+        badge: 'Rapid Debt Freedom',
+        rent: 850,
+        utilities: 120,
+        loan: 1700,
+        groceries: 300,
+        commute: 80,
+        personal: 60,
+        tripCost: 500,
+        tripMonth: 6,
+        color: 'border-rose-400 dark:border-rose-800/80',
+        summary: 'Erases debt principal rapidly while holding steady above the $200 floor.'
+      },
+      {
+        id: 'optD',
+        title: 'Downtown Solo Studio',
+        location: 'Roosevelt Row / Downtown',
+        emoji: '🏙️',
+        badge: 'Lifestyle Priority',
+        rent: 1550,
+        utilities: 210, // Peak solo summer air conditioning
+        loan: 1000,
+        groceries: 400,
+        commute: 40,
+        personal: 200,
+        tripCost: 500,
+        tripMonth: 6,
+        color: 'border-stone-300 dark:border-stone-700',
+        summary: 'Premium solo living, but monthly surplus tightens significantly.'
+      }
+    ];
+
+    // Global chart references (radar removed)
+    let cashflowChartInstance = null;
+    let trajectoryChartInstance = null;
+    let comparisonChartInstance = null;
+
+    // Tax computation engine for single filers in Phoenix, AZ
+    function computeTaxesAndNet(grossMonthly, k401, med, dentVis) {
+      const preTaxHealth = med + dentVis; // Section 125 pre-tax cafeteria (exempt from FICA, Fed, AZ)
+      const preTaxRetirement = k401;      // Traditional 401(k) (exempt from Fed, AZ; subject to FICA)
+      const totalPreTax = preTaxHealth + preTaxRetirement;
+
+      // 1. FICA Tax (6.2% Social Security + 1.45% Medicare = 7.65%)
+      const monthlyFicaTaxable = Math.max(0, grossMonthly - preTaxHealth);
+      const monthlyFica = monthlyFicaTaxable * 0.0765;
+
+      // 2. Federal Income Tax
+      // Standard deduction: ~$14,600/yr ($1,216.67/mo)
+      const annualFederalTaxable = Math.max(0, ((grossMonthly - totalPreTax) * 12) - 14600);
+      let annualFedTax = 0;
+      if (annualFederalTaxable > 47150) {
+        annualFedTax = (11600 * 0.10) + ((47150 - 11600) * 0.12) + ((annualFederalTaxable - 47150) * 0.22);
+      } else if (annualFederalTaxable > 11600) {
+        annualFedTax = (11600 * 0.10) + ((annualFederalTaxable - 11600) * 0.12);
+      } else {
+        annualFedTax = annualFederalTaxable * 0.10;
+      }
+      const monthlyFedTax = annualFedTax / 12;
+
+      // 3. Arizona State Income Tax (Flat 2.5% rate with standard deduction)
+      const annualAzTaxable = Math.max(0, ((grossMonthly - totalPreTax) * 12) - 14600);
+      const monthlyAzTax = (annualAzTaxable * 0.025) / 12;
+
+      const totalMonthlyTaxes = monthlyFica + monthlyFedTax + monthlyAzTax;
+      const netMonthlyIncome = grossMonthly - totalPreTax - totalMonthlyTaxes;
+
+      // Calculate tax savings compared to $0 pre-tax deductions
+      const noPreTaxFed = (Math.max(0, (grossMonthly * 12) - 14600) > 47150) 
+        ? ((11600 * 0.10) + ((47150 - 11600) * 0.12) + (((grossMonthly * 12) - 14600 - 47150) * 0.22)) / 12 
+        : 418;
+      const noPreTaxAz = (Math.max(0, (grossMonthly * 12) - 14600) * 0.025) / 12;
+      const noPreTaxFica = grossMonthly * 0.0765;
+      const baselineTaxes = noPreTaxFed + noPreTaxAz + noPreTaxFica;
+      const taxSavings = Math.max(0, Math.round(baselineTaxes - totalMonthlyTaxes));
+
+      return {
+        totalPreTax,
+        monthlyFica: Math.round(monthlyFica),
+        monthlyFedTax: Math.round(monthlyFedTax),
+        monthlyAzTax: Math.round(monthlyAzTax),
+        totalTaxes: Math.round(totalMonthlyTaxes),
+        netMonthlyIncome: Math.round(netMonthlyIncome),
+        taxSavings
+      };
+    }
+
+    function calculateMetrics(loan, rent, utils, groceries, commute, personal, tripCost = 500, tripMonth = 6) {
+      const housing = rent + utils;
+      const living = groceries + commute + personal;
+      const totalOutflows = loan + housing + living;
+      const surplus = state.income - totalOutflows;
+      const dailyDiscretionary = (groceries + personal) / 30;
+      const meetsFloor = surplus >= state.reserveFloor;
+
+      // 12-Month Sinking Fund Simulation
+      let runningSavings = 0;
+      let minAccountBalance = 0;
+      const trajectory = [];
+
+      for (let m = 1; m <= 12; m++) {
+        runningSavings += surplus;
+        if (m === tripMonth) {
+          runningSavings -= tripCost;
+        }
+        if (m === 1 || runningSavings < minAccountBalance) {
+          minAccountBalance = runningSavings;
+        }
+        trajectory.push(runningSavings);
+      }
+
+      const yearEndSavings = trajectory[11];
+      const annualDebtPaid = loan * 12;
+
+      // 100-Point Scoring Algorithm
+      let score = 0;
+      if (!meetsFloor) {
+        score = Math.max(10, Math.min(45, Math.round((surplus / state.reserveFloor) * 45)));
+      } else {
+        const surplusBonus = Math.min(35, Math.round(((surplus - state.reserveFloor) / 800) * 35));
+        const debtSpeedBonus = Math.min(35, Math.round(((loan - 1000) / 1000) * 35));
+        const comfortBonus = Math.min(30, Math.round((dailyDiscretionary / 25) * 30));
+        score = Math.min(100, 45 + surplusBonus + debtSpeedBonus + comfortBonus);
+      }
+
+      return {
+        housing,
+        living,
+        totalOutflows,
+        surplus,
+        dailyDiscretionary,
+        meetsFloor,
+        trajectory,
+        minAccountBalance,
+        yearEndSavings,
+        annualDebtPaid,
+        score
+      };
+    }
+
+    function updateDOM() {
+      // 1. Recalculate Pre-Tax Cuts and Net Take-Home
+      const taxData = computeTaxesAndNet(
+        state.grossMonthly,
+        state.contrib401k,
+        state.medical,
+        state.dentalVision
+      );
+      state.income = taxData.netMonthlyIncome;
+
+      // Update Pre-Tax Sliders Display
+      const pct401k = Math.round((state.contrib401k / state.grossMonthly) * 100);
+      document.getElementById('val401k').textContent = `$${state.contrib401k.toLocaleString()}/mo (${pct401k}%)`;
+      document.getElementById('valMedical').textContent = `$${state.medical.toLocaleString()}/mo`;
+      document.getElementById('valDentalVision').textContent = `$${state.dentalVision.toLocaleString()}/mo`;
+      document.getElementById('valTotalPreTax').textContent = `$${taxData.totalPreTax.toLocaleString()}`;
+      document.getElementById('valTaxShelterSave').textContent = `Saves ~$${taxData.taxSavings}/mo in taxes`;
+
+      // Update Header & Tax Banner
+      document.getElementById('headerNetPay').textContent = `$${state.income.toLocaleString()}/mo`;
+      document.getElementById('pillPreTaxTotal').textContent = `Pre-Tax: -$${taxData.totalPreTax.toLocaleString()}`;
+      document.getElementById('pillFedTax').textContent = `Fed: -$${taxData.monthlyFedTax.toLocaleString()}`;
+      document.getElementById('pillFicaTax').textContent = `FICA: -$${taxData.monthlyFica.toLocaleString()}`;
+      document.getElementById('pillStateTax').textContent = `AZ Flat: -$${taxData.monthlyAzTax.toLocaleString()}`;
+      document.getElementById('pillNetPay').textContent = `Net: $${state.income.toLocaleString()}/mo`;
+      document.getElementById('cardCashflowSub').textContent = `Distribution of your $${state.income.toLocaleString()} net income`;
+
+      // 2. Calculate Downstream Financial Metrics
+      const m = calculateMetrics(
+        state.loan,
+        state.rent,
+        state.utilities,
+        state.groceries,
+        state.commute,
+        state.personal,
+        state.tripCost,
+        state.tripMonth
+      );
+
+      // Update Living & Debt Slider Label Values
+      document.getElementById('valLoan').textContent = `$${state.loan.toLocaleString()}`;
+      document.getElementById('valRent').textContent = `$${state.rent.toLocaleString()}/mo`;
+      document.getElementById('valUtilities').textContent = `$${state.utilities.toLocaleString()}/mo`;
+      document.getElementById('valTotalHousing').textContent = `$${m.housing.toLocaleString()}`;
+      document.getElementById('valGroceries').textContent = `$${state.groceries.toLocaleString()}/mo`;
+      document.getElementById('valCommute').textContent = `$${state.commute.toLocaleString()}/mo`;
+      document.getElementById('valPersonal').textContent = `$${state.personal.toLocaleString()}/mo`;
+      document.getElementById('valTotalLiving').textContent = `$${m.living.toLocaleString()}`;
+
+      document.getElementById('valTripCost').textContent = `$${state.tripCost.toLocaleString()}`;
+      document.getElementById('valTripCostSub').textContent = `$${state.tripCost.toLocaleString()}`;
+      document.getElementById('valTripTimingLabel').textContent = `in Month ${state.tripMonth}`;
+      document.getElementById('valTripMonth').textContent = `Month ${state.tripMonth}`;
+
+      // Update Executive KPIs
+      document.getElementById('kpiTotalOutflows').textContent = `$${m.totalOutflows.toLocaleString()}`;
+      document.getElementById('kpiIncomeShare').textContent = `${Math.round((m.totalOutflows / state.income) * 100)}% of net pay`;
+
+      const elSurplus = document.getElementById('kpiNetSurplus');
+      elSurplus.textContent = `$${m.surplus.toLocaleString()}`;
+      if (m.meetsFloor) {
+        elSurplus.className = 'text-2xl sm:text-3xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400';
+      } else {
+        elSurplus.className = 'text-2xl sm:text-3xl font-extrabold font-mono text-rose-600 dark:text-rose-400';
+      }
+
+      document.getElementById('kpiDailyDiscretionary').textContent = `$${m.dailyDiscretionary.toFixed(2)}`;
+      document.getElementById('kpiLoanSpeed').textContent = `$${state.loan.toLocaleString()}`;
+
+      const elYearEnd = document.getElementById('kpiYearEndSavings');
+      elYearEnd.textContent = `$${m.yearEndSavings.toLocaleString()}`;
+      if (m.yearEndSavings < 0) {
+        elYearEnd.className = 'text-2xl sm:text-3xl font-extrabold font-mono text-rose-600 dark:text-rose-400';
+      } else {
+        elYearEnd.className = 'text-2xl sm:text-3xl font-extrabold font-mono text-teal-700 dark:text-teal-400';
+      }
+      document.getElementById('kpiYearEndSub').textContent = `After $${state.tripCost} trip in Month ${state.tripMonth}`;
+
+      // Update Alert Banner
+      const elAlert = document.getElementById('savingsStatusAlert');
+      if (m.surplus < 0) {
+        elAlert.className = 'rounded-2xl p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-900 text-rose-900 dark:text-rose-200 flex items-start gap-3 shadow-xs';
+        elAlert.innerHTML = `
+          <span class="text-xl">🚨</span>
+          <div>
+            <h4 class="font-bold text-sm">Monthly Deficit Warning (-$${Math.abs(m.surplus).toLocaleString()})</h4>
+            <p class="text-xs mt-0.5">Your monthly expenses exceed your $${state.income.toLocaleString()} net salary. Decrease loan payments, rent, or adjust pre-tax contributions to restore balance.</p>
+          </div>
+        `;
+      } else if (!m.meetsFloor) {
+        elAlert.className = 'rounded-2xl p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-900 text-amber-900 dark:text-amber-200 flex items-start gap-3 shadow-xs';
+        elAlert.innerHTML = `
+          <span class="text-xl">⚠️</span>
+          <div>
+            <h4 class="font-bold text-sm">Target Floor Missed ($${m.surplus.toLocaleString()}/mo vs $200 Target)</h4>
+            <p class="text-xs mt-0.5">You are currently saving $${m.surplus}/mo, which falls short of your non-negotiable $200 reserve floor by <strong>$${state.reserveFloor - m.surplus}</strong>.</p>
+          </div>
+        `;
+      } else {
+        elAlert.className = 'rounded-2xl p-4 bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-900/60 text-emerald-900 dark:text-emerald-200 flex items-start gap-3 shadow-xs';
+        elAlert.innerHTML = `
+          <span class="text-xl">✅</span>
+          <div>
+            <h4 class="font-bold text-sm">Financially Sound: Retaining $${m.surplus.toLocaleString()}/month</h4>
+            <p class="text-xs mt-0.5">You exceed your $200 savings target by <strong>+$${m.surplus - state.reserveFloor}/mo</strong> while investing $${state.contrib401k}/mo in 401(k) and accelerating debt by $${state.loan.toLocaleString()}/mo.</p>
+          </div>
+        `;
+      }
+
+      // Update Segmented Bar & Legend Percentages
+      const pctLoanVal = Math.max(0, Math.round((state.loan / state.income) * 100));
+      const pctHousingVal = Math.max(0, Math.round((m.housing / state.income) * 100));
+      const pctLivingVal = Math.max(0, Math.round((m.living / state.income) * 100));
+      const pctSurplusVal = Math.max(0, Math.round((m.surplus / state.income) * 100));
+
+      document.getElementById('barLoan').style.width = `${pctLoanVal}%`;
+      document.getElementById('barHousing').style.width = `${pctHousingVal}%`;
+      document.getElementById('barLiving').style.width = `${pctLivingVal}%`;
+      document.getElementById('barSurplus').style.width = `${Math.max(0, pctSurplusVal)}%`;
+
+      document.getElementById('pctLoan').textContent = `${pctLoanVal}%`;
+      document.getElementById('pctHousing').textContent = `${pctHousingVal}%`;
+      document.getElementById('pctLiving').textContent = `${pctLivingVal}%`;
+      document.getElementById('pctSurplus').textContent = `${pctSurplusVal}%`;
+
+      document.getElementById('legLoan').textContent = `$${state.loan.toLocaleString()}`;
+      document.getElementById('legHousing').textContent = `$${m.housing.toLocaleString()}`;
+      document.getElementById('legLiving').textContent = `$${m.living.toLocaleString()}`;
+      document.getElementById('legSurplus').textContent = `$${m.surplus.toLocaleString()}`;
+
+      // Update Center Doughnut Stats
+      document.getElementById('chartCenterSurplus').textContent = `$${m.surplus.toLocaleString()}`;
+      document.getElementById('chartCenterRatio').textContent = `${pctSurplusVal}% of Net`;
+
+      // Update Stress Test Card
+      const elFeasPill = document.getElementById('feasibilityPill');
+      const elFeasNote = document.getElementById('feasibilityNote');
+      const elBuffer = document.getElementById('unexpectedBuffer');
+
+      if (m.surplus >= 1000) {
+        elFeasPill.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+        elFeasPill.textContent = 'Excellent Cushion';
+        elFeasNote.innerHTML = `Your monthly surplus comfortably exceeds the floor by <strong class="text-emerald-600 dark:text-emerald-400 font-mono">+$${(m.surplus - state.reserveFloor).toLocaleString()}</strong>.`;
+      } else if (m.surplus >= 200) {
+        elFeasPill.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300';
+        elFeasPill.textContent = 'Meets Floor';
+        elFeasNote.innerHTML = `Your buffer covers the $200 target with <strong class="text-teal-600 dark:text-teal-400 font-mono">+$${(m.surplus - state.reserveFloor).toLocaleString()}</strong> extra.`;
+      } else {
+        elFeasPill.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300';
+        elFeasPill.textContent = 'At Risk';
+        elFeasNote.innerHTML = `Deficit of <strong class="text-rose-600 dark:text-rose-400 font-mono">-$${(state.reserveFloor - m.surplus).toLocaleString()}</strong> relative to target floor.`;
+      }
+      elBuffer.textContent = m.surplus > 0 ? `Safe up to $${m.surplus.toLocaleString()}/mo` : 'No Shock Buffer';
+
+      // Update Charts
+      updateCharts(m);
+      renderScenarioCards(m);
+    }
+
+    function initCharts() {
+      // Cashflow Doughnut Chart
+      const elDoughnut = document.getElementById('cashflowChart');
+      if (elDoughnut) {
+        const ctxDoughnut = elDoughnut.getContext('2d');
+        cashflowChartInstance = new Chart(ctxDoughnut, {
+          type: 'doughnut',
+          data: {
+            labels: ['Loan Acceleration', 'Housing & Utilities', 'Lifestyle Baseline', 'Monthly Net Surplus'],
+            datasets: [{
+              data: [1200, 1100, 500, 996],
+              backgroundColor: ['#E76F51', '#F4A261', '#588157', '#2A9D8F'],
+              borderWidth: 2,
+              borderColor: state.darkMode ? '#1C1618' : '#FFFFFF',
+              hoverOffset: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '72%',
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const val = context.raw || 0;
+                    const pct = Math.round((val / state.income) * 100);
+                    return ` ${context.label}: $${val.toLocaleString()} (${pct}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // 12-Month Sinking Fund Trajectory Line Chart (Full Width)
+      const elTraj = document.getElementById('savingsTrajectoryChart');
+      if (elTraj) {
+        const ctxTraj = elTraj.getContext('2d');
+        const months = ['Mo 1', 'Mo 2', 'Mo 3', 'Mo 4', 'Mo 5', 'Mo 6', 'Mo 7', 'Mo 8', 'Mo 9', 'Mo 10', 'Mo 11', 'Mo 12'];
+        trajectoryChartInstance = new Chart(ctxTraj, {
+          type: 'line',
+          data: {
+            labels: months,
+            datasets: [
+              {
+                label: 'Your Cumulative Bank (With Trip)',
+                data: [996, 1992, 2988, 3984, 4980, 5476, 6472, 7468, 8464, 9460, 10456, 11452],
+                borderColor: '#2A9D8F',
+                backgroundColor: 'rgba(42, 157, 143, 0.15)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+              },
+              {
+                label: 'Pure $200/mo Benchmark (No Trip)',
+                data: [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400],
+                borderColor: '#E9C46A',
+                borderDash: [5, 5],
+                borderWidth: 2,
+                fill: false,
+                tension: 0,
+                pointRadius: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: { color: state.darkMode ? '#292524' : '#F5F0EB' },
+                ticks: { color: state.darkMode ? '#A8A29E' : '#78716C' }
+              },
+              y: {
+                ticks: {
+                  callback: (val) => `$${(val / 1000).toFixed(1)}k`,
+                  color: state.darkMode ? '#A8A29E' : '#78716C'
+                },
+                grid: { color: state.darkMode ? '#292524' : '#F5F0EB' }
+              }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => ` ${ctx.dataset.label}: $${ctx.raw.toLocaleString()}`
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Comparison Bar Chart (1-Year Storyboard)
+      const elComp = document.getElementById('scenarioComparisonChart');
+      if (elComp) {
+        const ctxComp = elComp.getContext('2d');
+        comparisonChartInstance = new Chart(ctxComp, {
+          type: 'bar',
+          data: {
+            labels: ['West Valley', 'Tempe Hub', 'Debt Squeeze', 'Downtown', 'Live Sliders'],
+            datasets: [
+              {
+                label: '1-Year Debt Cleared',
+                data: [14400, 16200, 20400, 12000, 14400],
+                backgroundColor: '#E76F51',
+                borderRadius: 8
+              },
+              {
+                label: 'Year-End Bank Savings (Post-Trip)',
+                data: [13650, 9150, 6800, 4200, 11452],
+                backgroundColor: '#2A9D8F',
+                borderRadius: 8
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: state.darkMode ? '#A8A29E' : '#78716C', font: { size: 10 } }
+              },
+              y: {
+                ticks: {
+                  callback: (val) => `$${(val / 1000).toFixed(0)}k`,
+                  color: state.darkMode ? '#A8A29E' : '#78716C',
+                  font: { size: 10 }
+                },
+                grid: { color: state.darkMode ? '#292524' : '#F5F0EB' }
+              }
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  boxWidth: 10,
+                  color: state.darkMode ? '#D6D3D1' : '#57534E',
+                  font: { size: 11 }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => ` ${ctx.dataset.label}: $${ctx.raw.toLocaleString()}`
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function updateCharts(liveMetrics) {
+      if (cashflowChartInstance) {
+        cashflowChartInstance.data.datasets[0].data = [
+          state.loan,
+          liveMetrics.housing,
+          liveMetrics.living,
+          Math.max(0, liveMetrics.surplus)
+        ];
+        cashflowChartInstance.update();
+      }
+
+      if (trajectoryChartInstance) {
+        trajectoryChartInstance.data.datasets[0].data = liveMetrics.trajectory;
+        trajectoryChartInstance.update();
+
+        const elInsight = document.getElementById('trajectoryInsight');
+        if (elInsight) {
+          const diff = liveMetrics.yearEndSavings - 2400;
+          elInsight.innerHTML = `
+            <span>By Month 12, your emergency bank reserve reaches <strong>$${liveMetrics.yearEndSavings.toLocaleString()}</strong> after absorbing your travel plan.</span>
+            <span class="font-mono font-bold ${diff >= 0 ? 'text-teal-700 dark:text-teal-300' : 'text-rose-600'}">
+              ${diff >= 0 ? '+' : ''}$${diff.toLocaleString()} vs floor
+            </span>
+          `;
+        }
+      }
+    }
+
+    function renderScenarioCards(liveMetrics) {
+      const liveOption = {
+        id: 'optLive',
+        title: 'Your Live Sliders',
+        location: 'Custom Configuration',
+        emoji: '🎛️',
+        badge: 'Active Simulation',
+        rent: state.rent,
+        utilities: state.utilities,
+        loan: state.loan,
+        groceries: state.groceries,
+        commute: state.commute,
+        personal: state.personal,
+        tripCost: state.tripCost,
+        tripMonth: state.tripMonth,
+        color: 'border-orange-500 ring-2 ring-orange-500/20',
+        summary: 'Your dynamically modeled Phoenix lifestyle based on the sliders above.'
+      };
+
+      const allOptions = [...presetScenarios, liveOption];
+
+      const evaluated = allOptions.map(opt => {
+        const m = calculateMetrics(
+          opt.loan,
+          opt.rent,
+          opt.utilities,
+          opt.groceries,
+          opt.commute,
+          opt.personal,
+          opt.tripCost,
+          opt.tripMonth
+        );
+        return { ...opt, metrics: m };
+      });
+
+      // Find winner based on score
+      const winner = evaluated.reduce((prev, curr) => (curr.metrics.score > prev.metrics.score ? curr : prev), evaluated[0]);
+
+      const container = document.getElementById('scenariosGrid');
+      if (!container) return;
+
+      container.innerHTML = evaluated.map(opt => {
+        const isWinner = opt.id === winner.id;
+        const m = opt.metrics;
+
+        return `
+          <div class="desert-card rounded-2xl p-4 border transition-all duration-200 relative flex flex-col justify-between ${opt.color} ${isWinner ? 'shadow-md' : ''}">
+            ${isWinner ? `
+              <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-xs flex items-center gap-1">
+                <span>🏆</span> WINNER
+              </div>
+            ` : ''}
+
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">${opt.emoji}</span>
+                <div>
+                  <h4 class="font-bold text-sm text-stone-900 dark:text-stone-100">${opt.title}</h4>
+                  <p class="text-[11px] text-stone-500 dark:text-stone-400">${opt.location}</p>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs py-1.5 border-y border-stone-200/60 dark:border-stone-800">
+                <span class="text-stone-500 dark:text-stone-400">Total Score:</span>
+                <span class="font-mono font-extrabold text-sm ${m.score >= 75 ? 'text-emerald-600 dark:text-emerald-400' : m.score >= 50 ? 'text-amber-600' : 'text-rose-600'}">
+                  ${m.score}/100
+                </span>
+              </div>
+
+              <!-- Metric Bars -->
+              <div class="space-y-2 text-[11px]">
+                <div>
+                  <div class="flex justify-between text-stone-600 dark:text-stone-400">
+                    <span>⚡ Loan Acceleration</span>
+                    <span class="font-mono font-bold">$${opt.loan}/mo</span>
+                  </div>
+                  <div class="w-full h-1.5 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden mt-0.5">
+                    <div class="h-full bg-orange-500 rounded-full" style="width: ${Math.min(100, ((opt.loan - 1000) / 1000) * 100)}%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-stone-600 dark:text-stone-400">
+                    <span>🛡️ Monthly Net Surplus</span>
+                    <span class="font-mono font-bold ${m.meetsFloor ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}">
+                      $${m.surplus}/mo
+                    </span>
+                  </div>
+                  <div class="w-full h-1.5 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden mt-0.5">
+                    <div class="h-full ${m.meetsFloor ? 'bg-emerald-500' : 'bg-rose-500'} rounded-full" style="width: ${Math.max(0, Math.min(100, (m.surplus / 1500) * 100))}%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-stone-600 dark:text-stone-400">
+                    <span>☕ Daily Flexibility</span>
+                    <span class="font-mono font-bold text-amber-600 dark:text-amber-400">$${m.dailyDiscretionary.toFixed(1)}/day</span>
+                  </div>
+                  <div class="w-full h-1.5 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden mt-0.5">
+                    <div class="h-full bg-amber-400 rounded-full" style="width: ${Math.min(100, (m.dailyDiscretionary / 30) * 100)}%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-[11px] text-stone-500 dark:text-stone-400 leading-relaxed italic pt-1">
+                "${opt.summary}"
+              </p>
+            </div>
+
+            <!-- Footer Stats -->
+            <div class="pt-3 mt-3 border-t border-stone-200/60 dark:border-stone-800 flex items-center justify-between text-[11px] font-mono">
+              <span class="text-stone-400">Year-End Bank:</span>
+              <span class="font-bold ${m.yearEndSavings >= 2400 ? 'text-teal-700 dark:text-teal-400' : 'text-rose-500'}">
+                $${m.yearEndSavings.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Synchronize comparison bar chart
+      if (comparisonChartInstance) {
+        comparisonChartInstance.data.datasets[0].data = evaluated.map(e => e.metrics.annualDebtPaid);
+        comparisonChartInstance.data.datasets[1].data = evaluated.map(e => e.metrics.yearEndSavings);
+        comparisonChartInstance.update();
+      }
+    }
+
+    function setupEventListeners() {
+      // Sliders configuration (Pre-tax cuts + 3 Primary levers + Travel)
+      const bindings = [
+        { id: 'slider401k', key: 'contrib401k' },
+        { id: 'sliderMedical', key: 'medical' },
+        { id: 'sliderDentalVision', key: 'dentalVision' },
+        { id: 'sliderLoan', key: 'loan' },
+        { id: 'sliderRent', key: 'rent' },
+        { id: 'sliderUtilities', key: 'utilities' },
+        { id: 'sliderGroceries', key: 'groceries' },
+        { id: 'sliderCommute', key: 'commute' },
+        { id: 'sliderPersonal', key: 'personal' },
+        { id: 'sliderTripCost', key: 'tripCost' },
+        { id: 'sliderTripMonth', key: 'tripMonth' }
+      ];
+
+      bindings.forEach(b => {
+        const el = document.getElementById(b.id);
+        if (el) {
+          el.addEventListener('input', (e) => {
+            state[b.key] = parseFloat(e.target.value);
+            updateDOM();
+          });
+        }
+      });
+
+      // Dark Mode Toggle
+      const themeBtn = document.getElementById('themeToggleBtn');
+      if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+          state.darkMode = !state.darkMode;
+          document.documentElement.classList.toggle('dark', state.darkMode);
+          if (cashflowChartInstance) cashflowChartInstance.destroy();
+          if (trajectoryChartInstance) trajectoryChartInstance.destroy();
+          if (comparisonChartInstance) comparisonChartInstance.destroy();
+          initCharts();
+          updateDOM();
+        });
+      }
+
+      // Reset Defaults
+      const resetBtn = document.getElementById('resetDefaultsBtn');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          state.contrib401k = 250;
+          state.medical = 120;
+          state.dentalVision = 30;
+          state.loan = 1200;
+          state.rent = 950;
+          state.utilities = 150;
+          state.groceries = 350;
+          state.commute = 100;
+          state.personal = 50;
+          state.tripCost = 500;
+          state.tripMonth = 6;
+
+          document.getElementById('slider401k').value = 250;
+          document.getElementById('sliderMedical').value = 120;
+          document.getElementById('sliderDentalVision').value = 30;
+          document.getElementById('sliderLoan').value = 1200;
+          document.getElementById('sliderRent').value = 950;
+          document.getElementById('sliderUtilities').value = 150;
+          document.getElementById('sliderGroceries').value = 350;
+          document.getElementById('sliderCommute').value = 100;
+          document.getElementById('sliderPersonal').value = 50;
+          document.getElementById('sliderTripCost').value = 500;
+          document.getElementById('sliderTripMonth').value = 6;
+
+          updateDOM();
+        });
+      }
+
+      // Share Plan (Clipboard Copy without alert)
+      const copyBtn = document.getElementById('copyPlanBtn');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          const m = calculateMetrics(
+            state.loan,
+            state.rent,
+            state.utilities,
+            state.groceries,
+            state.commute,
+            state.personal,
+            state.tripCost,
+            state.tripMonth
+          );
+
+          const summary = `Phoenix Oasis Modeler:\n` +
+            `Gross: $5,000/mo ($60k/yr)\n` +
+            `• Pre-Tax 401(k): $${state.contrib401k}/mo\n` +
+            `• Medical/Dental/Vision: $${state.medical + state.dentalVision}/mo\n` +
+            `• Net Take-Home Pay: $${state.income}/mo\n` +
+            `• Accelerated Loan: $${state.loan}/mo\n` +
+            `• Housing & Utilities: $${m.housing}/mo\n` +
+            `• Lifestyle Baseline: $${m.living}/mo\n` +
+            `• Monthly Savings: $${m.surplus}/mo (Floor: $200)\n` +
+            `• Travel Plan: $${state.tripCost} trip in Month ${state.tripMonth}\n` +
+            `• Year-End Bank Reserves: $${m.yearEndSavings.toLocaleString()}`;
+
+          const temp = document.createElement('textarea');
+          temp.value = summary;
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand('copy');
+          document.body.removeChild(temp);
+
+          const originalText = copyBtn.innerHTML;
+          copyBtn.innerHTML = `<span>✓ Copied to Clipboard</span>`;
+          setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+          }, 2000);
+        });
+      }
+    }
+
+    window.onload = function () {
+      initCharts();
+      setupEventListeners();
+      updateDOM();
+    };
+  </script>
+</body>
+</html>
